@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Scooters in KC</title>
+<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js"></script>
+<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css" rel="stylesheet"/>
+<style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%;}
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+    const birdurl = 'https://mds.bird.co/gbfs/kansas-city/free_bike_status.json';
+    const spinurl = 'https://gbfs.spin.pm/api/gbfs/v1/kansas_city/free_bike_status';
+    const mapStyleDay =  'mapbox://styles/mapbox/streets-v11';
+    const mapStyleNight = 'mapbox://styles/mapbox/dark-v10';
+
+    // Set up the access code for mapbox
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYWtpbWJlcmx5MjA5NSIsImEiOiJja3RsbjA1amwxMjhyMnFvMG1obHQyY2Y3In0.R2MVYUd8z4AJdDMj1-nf9g';
+
+    // import the map
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: mapStyleDay,
+        center: [-94.5786, 39.0797],
+        zoom: 12
+    });
+
+    function renderScooters(scooters) {
+        const len = scooters.data.bikes.length;
+        console.log(scooters.data.bikes[0]);
+        for (let i = 0; i < len; i++) {
+            var marker = new mapboxgl.Marker()
+                .setLngLat([scooters.data.bikes[i].lon, scooters.data.bikes[i].lat])
+                .addTo(map);
+        }
+    }
+
+    // Get the data from the bike status json data: 
+    async function getScooters(url) {
+        let response = await fetch(url);
+        let scooters = await response.json();
+        renderScooters(scooters);
+    }
+    getScooters(birdurl);
+    getScooters(spinurl);
+
+</script>
+
+</body>
+</html>
